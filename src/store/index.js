@@ -1,8 +1,8 @@
-import { configureStore } from "@reduxjs/toolkit";
-import weather from './weather/slice';
+import { configureStore } from '@reduxjs/toolkit'
+import weather from './weather/slice'
 
 export default configureStore({
 	reducer: {
-		weather
-	}
+		weather,
+	},
 })

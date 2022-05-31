@@ -1,22 +1,33 @@
 import { Container } from './styled'
 import Aside from '../../components/Aside'
 import MainContent from '../../components/MainContent'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
-import { getCurrentWeatherByCityName, getHourlyWeatherByCityName } from '../../store/weather/asyncThunks'
+import { getHourlyWeatherByCityName } from '../../store/weather/asyncThunks'
+import { getDefaultCity } from '../../store/weather/slice'
 
 const MainPage = () => {
 	const dispatch = useDispatch()
+	const currentCityName = useSelector(state => state.weather.currentCityName)
+
 	useEffect(() => {
-		dispatch(getHourlyWeatherByCityName())
+		if (currentCityName) {
+			dispatch(getHourlyWeatherByCityName(currentCityName))
+		}
+	}, [currentCityName])
+
+	useEffect(() => {
+		dispatch(getDefaultCity())
 	}, [])
-	console.log(process.env.REACT_APP_API_URL)
+
 	return (
 		<Container>
 			<Aside/>
-			<MainContent/>
+			<MainContent
+				currentCityName={currentCityName}
+			/>
 		</Container>
 	)
 }
 
-export default MainPage;
+export default MainPage

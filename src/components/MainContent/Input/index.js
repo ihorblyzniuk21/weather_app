@@ -1,30 +1,48 @@
-import { Button, Input } from 'antd'
-import { useForm } from "react-hook-form";
-import { Form } from './styled'
+import { useForm } from 'react-hook-form'
+import { Form, Input, Button } from './styled'
 import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { getCities } from '../../../store/weather/slice'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+	getAllCitiesFromLocalStorage,
+	setCitiesToLocalStorage,
+	setCurrentCity,
+} from '../../../store/weather/slice'
+import { getHourlyWeatherByCityName } from '../../../store/weather/asyncThunks'
 
 const InputComponent = () => {
 	const dispatch = useDispatch()
-	const { register, handleSubmit, watch, formState: { errors } } = useForm();
-	const citiesArr = JSON.parse(localStorage.getItem('cities')) || [];
+	const { register, handleSubmit } = useForm()
+	const citiesArr = JSON.parse(localStorage.getItem('cities')) || []
+	const error = useSelector(state => state.weather.error)
 
 	useEffect(() => {
-		dispatch(getCities())
+		dispatch(getAllCitiesFromLocalStorage())
 	}, [citiesArr])
 
-	const onSubmit = (data) => {
-		console.log(data)
-		citiesArr.push({name: data.name, default: false})
-		localStorage.setItem('cities', JSON.stringify(citiesArr))
-	};
+	const onSubmit = async (data) => {
+		const arr = citiesArr.filter((city) => {
+			if (city.name === data.name) {
+				return city
+			}
+		})
+		if (!arr.length && data.name !== '' && !error) {
+			citiesArr.push({ name: data.name, default: false })
+			dispatch(setCitiesToLocalStorage(citiesArr))
+			await dispatch(getHourlyWeatherByCityName(data.name))
+			console.log('input')
+			dispatch(setCurrentCity(data.name))
+		}
+
+	}
 
 	return (
-		<Form onSubmit={handleSubmit(onSubmit)}>
-			<input placeholder="Enter city" {...register("name")} />
-			<button type='submit'>Enter</button>
-		</Form>
+		<>
+			<Form onSubmit={handleSubmit(onSubmit)}>
+				<Input placeholder="Enter city" {...register('name')} />
+				<Button type="submit">Enter</Button>
+			</Form>
+			<div style={{ color: 'red' }}>{error}</div>
+		</>
 	)
 }
 

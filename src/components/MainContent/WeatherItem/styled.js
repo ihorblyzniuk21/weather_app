@@ -12,17 +12,17 @@ export const Time = styled.div`
 `
 
 export const Temp = styled.div`
-
+  color: #650909;
 `
 
 export const Feels = styled.div`
-	
+  color: #650909;
 `
 
 export const Pressure = styled.div`
-	
+  color: darkblue;
 `
 
 export const Humidity = styled.div`
-	
+  color: darkblue;
 `
